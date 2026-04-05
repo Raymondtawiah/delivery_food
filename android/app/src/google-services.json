@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "206794366431",
+    "firebase_url": "https://food-delivery-b270a-default-rtdb.firebaseio.com",
+    "project_id": "food-delivery-b270a",
+    "storage_bucket": "food-delivery-b270a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206794366431:android:77b22aa2d6684604b1786a",
+        "android_client_info": {
+          "package_name": "Food.delivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIMOND8-snms_HfPvCos08su45PD_FHyk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:206794366431:android:2f8e9c1b4d5a6f7g8h9i0j",
+        "android_client_info": {
+          "package_name": "com.example.food_delivery"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIMOND8-snms_HfPvCos08su45PD_FHyk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
