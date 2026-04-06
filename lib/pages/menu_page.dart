@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../main.dart' show AppColors;
 
 class MenuPage extends StatefulWidget {
   final Function(MenuItem item)? onAddToCart;
@@ -120,7 +121,7 @@ class _MenuPageState extends State<MenuPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Our Menu'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColors.burntOrange,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -155,7 +156,7 @@ class _MenuPageState extends State<MenuPage> {
                   height: 8,
                   decoration: BoxDecoration(
                     color: _currentPage == index
-                        ? Colors.deepPurple
+                        ? AppColors.burntOrange
                         : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -214,7 +215,7 @@ class _MenuPageState extends State<MenuPage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: AppColors.burntOrange.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -230,12 +231,12 @@ class _MenuPageState extends State<MenuPage> {
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
-                  color: Colors.deepPurple.shade100,
+                  color: Colors.grey.shade100,
                   child: const Center(
                     child: Icon(
                       Icons.restaurant,
                       size: 64,
-                      color: Colors.deepPurple,
+                      color: AppColors.burntOrange,
                     ),
                   ),
                 );
@@ -248,7 +249,7 @@ class _MenuPageState extends State<MenuPage> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withValues(alpha: 0.7),
+                    AppColors.burntOrange.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -330,7 +331,7 @@ class _MenuPageState extends State<MenuPage> {
                         item.price,
                         style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.deepPurple,
+                          color: AppColors.burntOrange,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -344,7 +345,7 @@ class _MenuPageState extends State<MenuPage> {
                           label: const Text('Add'),
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero,
-                            backgroundColor: Colors.deepPurple,
+                            backgroundColor: AppColors.burntOrange,
                             foregroundColor: Colors.white,
                           ),
                         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../main.dart' show AppColors;
 
 class Navbar extends StatelessWidget {
   final int currentIndex;
@@ -19,7 +20,7 @@ class Navbar extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
-      selectedItemColor: Colors.deepPurple,
+      selectedItemColor: AppColors.burntOrange,
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.fixed,
       items: [

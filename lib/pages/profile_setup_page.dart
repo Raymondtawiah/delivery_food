@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../widgets/flash_overlay.dart';
+import '../main.dart' show AppColors;
 
 class ProfileSetupPage extends StatefulWidget {
-  final User user;
+  final User? user;
+  final String? userId;
   final String email;
   final VoidCallback? onSetupComplete;
 
-  const ProfileSetupPage({super.key, required this.user, required this.email, this.onSetupComplete});
+  const ProfileSetupPage({super.key, this.user, this.userId, required this.email, this.onSetupComplete});
 
   @override
   State<ProfileSetupPage> createState() => _ProfileSetupPageState();
@@ -37,7 +39,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
       });
       
       try {
-        final userRef = FirebaseDatabase.instance.ref('users/${widget.user.uid}');
+        final userRef = FirebaseDatabase.instance.ref('users/${widget.userId ?? widget.user?.uid}');
         await userRef.set({
           'name': _nameController.text.trim(),
           'phone': _phoneController.text.trim(),
@@ -79,7 +81,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Complete Profile'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColors.burntOrange,
         foregroundColor: Colors.white,
       ),
       body: Stack(
@@ -95,7 +97,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                   const Icon(
                     Icons.person_add,
                     size: 80,
-                    color: Colors.deepPurple,
+                    color: AppColors.burntOrange,
                   ),
                   const SizedBox(height: 24),
                   const Text(
@@ -164,7 +166,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
                   ElevatedButton(
                     onPressed: _isLoading ? null : _saveProfile,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.deepPurple,
+                      backgroundColor: AppColors.burntOrange,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(

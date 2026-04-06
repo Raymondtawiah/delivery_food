@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../main.dart' show AppColors;
 import 'package:provider/provider.dart';
 import '../services/cart_service.dart';
 
@@ -79,7 +80,7 @@ class _CustomizationPageState extends State<CustomizationPage> {
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurple,
+                  backgroundColor: AppColors.burntOrange,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
@@ -100,7 +101,7 @@ class _CustomizationPageState extends State<CustomizationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.name),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColors.burntOrange,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -140,7 +141,7 @@ class _CustomizationPageState extends State<CustomizationPage> {
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
+                          color: AppColors.burntOrange,
                         ),
                       ),
                     ],
@@ -171,7 +172,7 @@ class _CustomizationPageState extends State<CustomizationPage> {
                         addon['name'] as String,
                         addon['price'] as double,
                       ),
-                      activeColor: Colors.deepPurple,
+                      activeColor: AppColors.burntOrange,
                     )),
                   ],
                   const SizedBox(height: 32),
@@ -180,7 +181,7 @@ class _CustomizationPageState extends State<CustomizationPage> {
                     child: ElevatedButton(
                       onPressed: _addToCart,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
+                        backgroundColor: AppColors.burntOrange,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),

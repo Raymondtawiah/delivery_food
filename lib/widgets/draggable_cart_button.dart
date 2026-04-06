@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../main.dart' show AppColors;
 import 'package:provider/provider.dart';
 import '../services/cart_service.dart';
 
@@ -18,11 +19,11 @@ class DraggableCartButton extends StatelessWidget {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: Colors.deepPurple,
+              color: AppColors.burntOrange,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.3),
+                  color: AppColors.burntOrange.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),

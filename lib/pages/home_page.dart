@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../main.dart' show AppColors;
 
 class HomePage extends StatefulWidget {
   final VoidCallback? onNavigateToMenu;
@@ -99,8 +100,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Foodie'),
-        backgroundColor: Colors.deepPurple,
+        title: const Text(
+          'Foodie',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+        backgroundColor: AppColors.burntOrange,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -135,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                   height: 8,
                   decoration: BoxDecoration(
                     color: _currentPage == index
-                        ? Colors.deepPurple
+                        ? AppColors.burntOrange
                         : Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(4),
                   ),
@@ -170,7 +178,7 @@ class _HomePageState extends State<HomePage> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: AppColors.burntOrange.withValues(alpha: 0.2),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -186,12 +194,12 @@ class _HomePageState extends State<HomePage> {
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
-                  color: Colors.deepPurple.shade100,
+                  color: Colors.grey.shade100,
                   child: const Center(
                     child: Icon(
                       Icons.restaurant,
                       size: 64,
-                      color: Colors.deepPurple,
+                      color: AppColors.burntOrange,
                     ),
                   ),
                 );
@@ -204,7 +212,7 @@ class _HomePageState extends State<HomePage> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Colors.black.withValues(alpha: 0.7),
+                    AppColors.burntOrange.withValues(alpha: 0.7),
                   ],
                 ),
               ),
@@ -285,7 +293,7 @@ class _HomePageState extends State<HomePage> {
                           item.price,
                           style: const TextStyle(
                             fontSize: 14,
-                            color: Colors.deepPurple,
+                            color: AppColors.burntOrange,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -299,7 +307,7 @@ class _HomePageState extends State<HomePage> {
                             label: const Text('Add'),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.zero,
-                              backgroundColor: Colors.deepPurple,
+                              backgroundColor: AppColors.burntOrange,
                               foregroundColor: Colors.white,
                             ),
                           ),

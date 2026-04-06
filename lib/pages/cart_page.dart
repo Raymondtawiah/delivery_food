@@ -2,16 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/cart_service.dart';
 import 'checkout_page.dart';
+import '../main.dart' show AppColors;
 
 class CartPage extends StatelessWidget {
-  const CartPage({super.key});
+  final String? userId;
+  final String? email;
+
+  const CartPage({super.key, this.userId, this.email});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Cart'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColors.burntOrange,
         foregroundColor: Colors.white,
       ),
       body: Consumer<CartService>(
@@ -73,7 +77,7 @@ class CartPage extends StatelessWidget {
                             Text(
                               '₵${item.totalPrice.toStringAsFixed(2)}',
                               style: const TextStyle(
-                                color: Colors.deepPurple,
+                                color: AppColors.burntOrange,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -126,7 +130,7 @@ class CartPage extends StatelessWidget {
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.deepPurple,
+                        color: AppColors.burntOrange,
                       ),
                     ),
                   ],
@@ -135,11 +139,16 @@ class CartPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const CheckoutPage()),
+                      MaterialPageRoute(
+                        builder: (_) => CheckoutPage(
+                          userId: userId,
+                          email: email,
+                        ),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepPurple,
+                    backgroundColor: AppColors.burntOrange,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 32,

@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import '../main.dart' show AppColors;
 
 class AccountPage extends StatelessWidget {
   final VoidCallback? onSignOut;
   final VoidCallback? onDeleteAccount;
+  final String? userId;
+  final String? email;
 
-  const AccountPage({super.key, this.onSignOut, this.onDeleteAccount});
+  const AccountPage({super.key, this.onSignOut, this.onDeleteAccount, this.userId, this.email});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColors.burntOrange,
         foregroundColor: Colors.white,
       ),
       body: ListView(
@@ -26,6 +29,8 @@ class AccountPage extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (_) => AccountSettingsPage(
+                  userId: userId,
+                  email: email,
                   onSignOut: onSignOut,
                   onDeleteAccount: onDeleteAccount,
                 ),
@@ -38,7 +43,9 @@ class AccountPage extends StatelessWidget {
             title: 'Past Orders',
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const PastOrdersPage()),
+              MaterialPageRoute(
+                builder: (_) => PastOrdersPage(userId: userId),
+              ),
             ),
           ),
         ],
@@ -53,7 +60,7 @@ class AccountPage extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      leading: Icon(icon, color: Colors.deepPurple),
+      leading: Icon(icon, color: AppColors.burntOrange),
       title: Text(title),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
       onTap: onTap,
@@ -64,8 +71,10 @@ class AccountPage extends StatelessWidget {
 class AccountSettingsPage extends StatefulWidget {
   final VoidCallback? onSignOut;
   final VoidCallback? onDeleteAccount;
+  final String? userId;
+  final String? email;
 
-  const AccountSettingsPage({super.key, this.onSignOut, this.onDeleteAccount});
+  const AccountSettingsPage({super.key, this.onSignOut, this.onDeleteAccount, this.userId, this.email});
 
   @override
   State<AccountSettingsPage> createState() => _AccountSettingsPageState();
@@ -87,9 +96,14 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   }
 
   Future<void> _loadUserData() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      _userId = user.uid;
+    String? uid = widget.userId;
+    if (uid == null) {
+      final user = FirebaseAuth.instance.currentUser;
+      uid = user?.uid;
+    }
+    
+    if (uid != null) {
+      _userId = uid;
       try {
         final snapshot = await FirebaseDatabase.instance.ref('users/$_userId').get();
         if (snapshot.exists) {
@@ -216,12 +230,13 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = widget.userId != null ? null : FirebaseAuth.instance.currentUser;
+    final email = widget.email ?? user?.email ?? '';
     
     return Scaffold(
       appBar: AppBar(
         title: const Text('Account Settings'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColors.burntOrange,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -283,7 +298,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                initialValue: user?.email ?? '',
+                initialValue: email,
                 readOnly: true,
                 decoration: InputDecoration(
                   labelText: 'Email',
@@ -312,7 +327,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     _hasChanges = true;
                   });
                 },
-                activeThumbColor: Colors.deepPurple,
+                activeThumbColor: AppColors.burntOrange,
               ),
               const SizedBox(height: 32),
               Row(
@@ -331,7 +346,7 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
                     child: ElevatedButton(
                       onPressed: (_hasChanges && !_isLoading) ? _saveChanges : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
+                        backgroundColor: AppColors.burntOrange,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
@@ -360,20 +375,276 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   }
 }
 
-class PastOrdersPage extends StatelessWidget {
-  const PastOrdersPage({super.key});
+class PastOrdersPage extends StatefulWidget {
+  final String? userId;
+
+  const PastOrdersPage({super.key, this.userId});
+
+  @override
+  State<PastOrdersPage> createState() => _PastOrdersPageState();
+}
+
+class _PastOrdersPageState extends State<PastOrdersPage> {
+  List<Map<String, dynamic>> _orders = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrders();
+  }
+
+  Future<void> _loadOrders() async {
+    String? uid = widget.userId;
+    
+    debugPrint('Loading orders for userId: $uid');
+    
+    if (uid == null) {
+      try {
+        final user = FirebaseAuth.instance.currentUser;
+        uid = user?.uid;
+        debugPrint('Got uid from FirebaseAuth: $uid');
+      } catch (e) {
+        debugPrint('Error getting user: $e');
+      }
+    }
+
+    if (uid != null) {
+      try {
+        final snapshot = await FirebaseDatabase.instance.ref('orders').get();
+        
+        debugPrint('Orders snapshot exists: ${snapshot.exists}');
+        
+        if (snapshot.exists) {
+          final List<Map<String, dynamic>> loadedOrders = [];
+          final data = Map<String, dynamic>.from(snapshot.value as Map);
+          
+          data.forEach((key, value) {
+            final orderMap = Map<String, dynamic>.from(value as Map);
+            final orderUserId = orderMap['userId']?.toString() ?? '';
+            
+            debugPrint('Order userId: $orderUserId, looking for: $uid');
+            
+            if (orderUserId == uid) {
+              orderMap['orderId'] = key;
+              loadedOrders.add(orderMap);
+            }
+          });
+          
+          loadedOrders.sort((a, b) {
+            final aDate = DateTime.tryParse(a['createdAt'] ?? '') ?? DateTime(1970);
+            final bDate = DateTime.tryParse(b['createdAt'] ?? '') ?? DateTime(1970);
+            return bDate.compareTo(aDate);
+          });
+          
+          debugPrint('Found ${loadedOrders.length} orders');
+          
+          setState(() {
+            _orders = loadedOrders;
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        debugPrint('Error loading orders: $e');
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else {
+      debugPrint('No uid found');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Past Orders'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: AppColors.burntOrange,
         foregroundColor: Colors.white,
       ),
-      body: const Center(
-        child: Text('No past orders yet'),
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _orders.isEmpty
+              ? const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.receipt_long, size: 64, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text('No past orders yet', style: TextStyle(fontSize: 18, color: Colors.grey)),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _orders.length,
+                  itemBuilder: (context, index) {
+                    final order = _orders[index];
+                    final itemsData = order['items'];
+                    final List<dynamic> items = itemsData is List ? itemsData : [];
+                    final totalAmount = (order['totalAmount'] ?? 0.0).toDouble();
+                    final status = order['status'] ?? 'pending';
+                    final createdAt = order['createdAt'] ?? '';
+                    
+                    DateTime? orderDate;
+                    try {
+                      orderDate = DateTime.parse(createdAt);
+                    } catch (e) {
+                      orderDate = null;
+                    }
+
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: ExpansionTile(
+                        tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        childrenPadding: const EdgeInsets.all(16),
+                        leading: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.receipt, color: AppColors.burntOrange),
+                        ),
+                        title: Text(
+                          'Order #${order['orderId']?.substring(0, 8) ?? ''}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '₵${totalAmount.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                color: AppColors.burntOrange,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (orderDate != null)
+                              Text(
+                                '${orderDate.day}/${orderDate.month}/${orderDate.year}',
+                                style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                              ),
+                          ],
+                        ),
+                        trailing: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: status == 'pending' 
+                                ? Colors.orange.shade100 
+                                : (status == 'completed' ? Colors.green.shade100 : Colors.red.shade100),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            status.toString().toUpperCase(),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: status == 'pending' 
+                                  ? Colors.orange 
+                                  : (status == 'completed' ? Colors.green : Colors.red),
+                            ),
+                          ),
+                        ),
+                        children: [
+                          const Divider(),
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Order Details',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          ...items.map<Widget>((item) {
+                            final itemMap = item is Map ? Map<String, dynamic>.from(item) : {};
+                            final itemName = itemMap['name'] ?? '';
+                            final itemTotal = (itemMap['totalPrice'] ?? 0.0).toDouble();
+                            final List<String> itemAddons = [];
+                            if (itemMap['addons'] is List) {
+                              itemAddons.addAll((itemMap['addons'] as List).map((e) => e.toString()));
+                            }
+                            
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          itemName,
+                                          style: const TextStyle(fontWeight: FontWeight.w500),
+                                        ),
+                                        if (itemAddons.isNotEmpty)
+                                          Text(
+                                            itemAddons.join(', '),
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey.shade600,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  Text(
+                                    '₵${itemTotal.toStringAsFixed(2)}',
+                                    style: const TextStyle(fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                          const Divider(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text(
+                                'Total',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                              Text(
+                                '₵${totalAmount.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold, 
+                                  fontSize: 16,
+                                  color: AppColors.burntOrange,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (order['address'] != null && order['address'].toString().isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    order['address'],
+                                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }

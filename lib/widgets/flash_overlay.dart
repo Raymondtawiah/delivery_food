@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../main.dart' show AppColors;
 
 class LoadingDots extends StatefulWidget {
   final Color color;
@@ -115,25 +116,27 @@ class _FlashOverlayState extends State<FlashOverlay> with SingleTickerProviderSt
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 2000),
       vsync: this,
     );
 
     _scaleAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.2), weight: 30),
-      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0), weight: 20),
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.2), weight: 20),
+      TweenSequenceItem(tween: Tween(begin: 1.2, end: 1.0), weight: 15),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 45),
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 20),
     ]).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     _opacityAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 20),
-      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 60),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 15),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 65),
       TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 20),
     ]).animate(_controller);
 
-    _controller.forward().then((_) {
-      widget.onComplete?.call();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.forward().then((_) {
+        widget.onComplete?.call();
+      });
     });
   }
 
@@ -149,37 +152,43 @@ class _FlashOverlayState extends State<FlashOverlay> with SingleTickerProviderSt
       animation: _controller,
       builder: (context, child) {
         return Container(
-          color: Colors.black.withValues(alpha: 0.3),
-          child: Opacity(
-            opacity: _opacityAnimation.value,
-            child: Center(
-              child: Transform.scale(
-                scale: _scaleAnimation.value,
+          color: AppColors.burntOrange.withValues(alpha: 0.5),
+          child: Center(
+            child: Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Opacity(
+                opacity: _opacityAnimation.value,
                 child: Container(
-                  width: 100,
-                  height: 100,
+                  width: 120,
+                  height: 120,
                   decoration: BoxDecoration(
                     color: widget.isLoading == true 
-                        ? Colors.deepPurple 
-                        : (widget.isSuccess == true ? Colors.green : Colors.red),
+                        ? Colors.white 
+                        : (widget.isSuccess == true ? AppColors.burntOrange : Colors.red),
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color: (widget.isLoading == true 
-                            ? Colors.deepPurple 
-                            : (widget.isSuccess == true ? Colors.green : Colors.red))
+                            ? AppColors.burntOrange 
+                            : (widget.isSuccess == true ? AppColors.burntOrange : Colors.red))
                             .withValues(alpha: 0.5),
-                        blurRadius: 20,
-                        spreadRadius: 5,
+                        blurRadius: 30,
+                        spreadRadius: 10,
                       ),
                     ],
                   ),
                   child: widget.isLoading == true
-                      ? const LoadingDots(color: Colors.white)
+                      ? const Padding(
+                          padding: EdgeInsets.all(30),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 4,
+                            color: AppColors.burntOrange,
+                          ),
+                        )
                       : Icon(
                           widget.isSuccess == true ? Icons.check : Icons.close,
                           color: Colors.white,
-                          size: 50,
+                          size: 60,
                         ),
                 ),
               ),
