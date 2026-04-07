@@ -28,11 +28,11 @@ class OrderEmailService {
     _init();
     
     final itemsHtml = items.map((item) {
-      final itemName = item['name'] ?? '';
-      final itemPrice = item['price'] ?? 0;
-      final addons = item['addons'] as List<String>? ?? [];
-      final addonPrice = item['addonPrice'] ?? 0.0;
-      final totalPrice = item['totalPrice'] ?? itemPrice;
+      final itemName = item['name']?.toString() ?? '';
+      final itemPrice = (item['price'] ?? 0).toDouble();
+      final addons = item['addons'] as List<dynamic>? ?? [];
+      final addonPrice = (item['addonPrice'] ?? 0.0).toDouble();
+      final totalPrice = (item['totalPrice'] ?? itemPrice).toDouble();
       
       String addonsHtml = '';
       if (addons.isNotEmpty) {
@@ -60,7 +60,7 @@ Phone: $phone
 Address: $address
 
 Order Items:
-${items.map((item) => '- ${item['name']}: ₵${item['totalPrice']}').join('\n')}
+${items.map((item) => '- ${item['name']}: ₵${(item['totalPrice'] ?? item['price']).toStringAsFixed(2)}').join('\n')}
 
 Total: ₵${totalAmount.toStringAsFixed(2)}
 
@@ -74,7 +74,7 @@ Thank you for ordering with Foodie!
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
     .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; }
-    .header { background: #673AB7; color: white; padding: 20px; text-align: center; }
+    .header { background: #FFCC5500; color: white; padding: 20px; text-align: center; }
     .content { padding: 20px; }
     .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
     .info-label { color: #666; }
@@ -108,7 +108,7 @@ Thank you for ordering with Foodie!
       <h3>Order Details</h3>
       <table>
         <thead>
-          <tr style="background: #673AB7; color: white;">
+          <tr style="background: #FFCC5500; color: white;">
             <th style="padding: 12px 8px; text-align: left;">Item</th>
             <th style="padding: 12px 8px; text-align: right;">Price</th>
           </tr>

@@ -394,6 +394,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
             ),
         ],
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        selectedItemColor: AppColors.burntOrange,
+        unselectedItemColor: Colors.grey,
+        onTap: (index) {
+          if (index == 0) Navigator.pop(context);
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Account',
+          ),
+        ],
+      ),
     );
   }
 }
